@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mahesh Prasad Sinha Science College - Result System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>  
+<style>
+    body {
+        background:radial-gradient(ellipse at center, rgba(255,254,234,1) 0%, rgba(255,254,234,1) 35%, #B7E8EB 100%);
+        overflow: hidden;
+      }
+      
+      .ocean {
+        height: 5%;
+        width:100%;
+        position:absolute;
+        bottom:0;
+        left:0;
+        background: #015871;
+      }
+      
+      .wave {
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) repeat-x;
+        position: absolute;
+        top: -198px;
+        width: 6400px;
+        height: 198px;
+        animation: wave 5s cubic-bezier( 0.36, 0.45, 0.63, 0.53) infinite;
+        transform: translate3d(0, 0, 0);
+      }
+      
+      .wave:nth-of-type(2) {
+        top: -175px;
+        animation: wave 7s cubic-bezier( 0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite;
+        opacity: 1;
+      }
+      
+      @keyframes wave {
+        0% {
+            margin-left: 0;
+        }
+        100% {
+            margin-left: -1600px;
+        }
+      }
+      
+      @keyframes swell {
+        0%, 100% {
+            transform: translate3d(0,-25px,0);
+        }
+        50% {
+            transform: translate3d(0,5px,0);
+        }
+      }
+      
+    * {
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+    
+    body {
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    
+    .container {
+        width: 80%;
+        margin: auto;
+        overflow: hidden;
+        padding: 20px;
+        background-color: #fff;
+        margin-top: 30px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    h1, h2 {
+        text-align: center;
+        color: #333;
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column;
+        margin: 20px 0;
+    }
+    
+    label {
+        margin: 10px 0 5px;
+        color: #555;
+    }
+    
+    input[type="text"],
+    input[type="number"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    
+    button {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #5cb85c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    button:hover {
+        background-color: #4cae4c;
+    }
+    
+    .menu-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .menu-buttons button {
+        width: 200px;
+    }
+    
+    .hidden {
+        display: none;
+    }
+    
+    #result-content, #aggregate-result-content {
+        background-color: #e9ecef;
+        padding: 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 600px) {
+        .menu-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .menu-buttons button {
+            width: 100%;
+        }
+    }
+    
+    /* Additional Styling for Dynamic Subjects */
+    .subject-container {
+        margin-bottom: 10px;
+    }
+    
+</style>
+<body>
+    <div class="ocean">
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <div class="container">
+        <!-- Welcome Section -->
+        <section id="welcome">
+            <h1>Welcome to Mahesh Prasad Sinha Science College</h1>
+            <form id="student-info">
+                <label for="name">Name of Student:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="fname">Father's Name:</label>
+                <input type="text" id="fname" name="fname" required>
+
+                <label for="roll">Roll Number:</label>
+                <input type="number" id="roll" name="roll" required>
+
+                <button type="button" onclick="showMenu()">Proceed</button>
+            </form>
+        </section>
+
+        <!-- Menu Section -->
+        <section id="menu" class="hidden">
+            <h2>Select an Option</h2>
+            <div class="menu-buttons">
+                <button onclick="showSemesterForm(1)">First Semester</button>
+                <button onclick="showSemesterForm(2)">Second Semester</button>
+                <button onclick="showSemesterForm(3)">Third Semester</button>
+                <button onclick="showSemesterForm(4)">Fourth Semester</button>
+                <button onclick="showSemesterForm(5)">Fifth Semester</button>
+                <button onclick="showSemesterForm(6)">Sixth Semester</button>
+                <button onclick="showFinalResult()">Final Result</button>
+                <button onclick="viewAggregate([1,2])">View Semesters 1 & 2</button>
+                <button onclick="viewAggregate([1,2,3])">View Semesters 1, 2 & 3</button>
+                <button onclick="viewAggregate([1,2,3,4])">View Semesters 1, 2, 3 & 4</button>
+                <button onclick="viewAggregate([1,2,3,4,5])">View Semesters 1, 2, 3, 4 & 5</button>
+                <button onclick="exitProgram()">Exit</button>
+            </div>
+        </section>
+
+        <!-- Semester Form Template -->
+        <section id="semester-form" class="hidden">
+            <h2 id="semester-title">Semester X Marks</h2>
+            <form id="marks-form">
+                <div id="subjects-container">
+                    <!-- Dynamic Subject Fields Will Be Injected Here -->
+                </div>
+                <button type="submit">Submit Marks</button>
+                <button type="button" onclick="hideSemesterForm()">Cancel</button>
+            </form>
+        </section>
+
+        <!-- Result Display Section -->
+        <section id="result-display" class="hidden">
+            <h2>Semester Result</h2>
+            <div id="result-content">
+                <!-- Results will be displayed here -->
+            </div>
+            <button type="button" onclick="hideResult()">Back to Menu</button>
+        </section>
+
+        <!-- Aggregate Result Display Section -->
+        <section id="aggregate-result-display" class="hidden">
+            <h2>Aggregate Result</h2>
+            <div id="aggregate-result-content">
+                <!-- Aggregate Results will be displayed here -->
+            </div>
+            <button type="button" onclick="hideAggregateResult()">Back to Menu</button>
+        </section>
+    </div>
+
+    <!-- JavaScript for Basic Navigation and Functionality -->
+    <script>
+        // Define the number of subjects per semester
+        const subjectsPerSemester = {
+            1: 6,
+            2: 6,
+            3: 6,
+            4: 6,
+            5: 6,
+            6: 3
+        };
+
+        // Object to store marks for each semester
+        const studentMarks = {
+            semester1: {},
+            semester2: {},
+            semester3: {},
+            semester4: {},
+            semester5: {},
+            semester6: {}
+        };
+    
+        // Object to store student information
+        const studentInfo = {};
+    
+        function showMenu() {
+            // Collect and store student information
+            const name = document.getElementById('name').value.trim();
+            const fname = document.getElementById('fname').value.trim();
+            const roll = document.getElementById('roll').value.trim();
+    
+            if(name === "" || fname === "" || roll === "") {
+                alert("Please fill in all the required fields.");
+                return;
+            }
+    
+            studentInfo.name = name;
+            studentInfo.fatherName = fname;
+            studentInfo.rollNumber = roll;
+    
+            document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+        }
+    
+        function showSemesterForm(semester) {
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('semester-form').classList.remove('hidden');
+            document.getElementById('semester-title').innerText = `Semester ${semester} Marks`;
+            document.getElementById('marks-form').setAttribute('data-semester', semester);
+            
+            // Clear previous subject fields
+            const subjectsContainer = document.getElementById('subjects-container');
+            subjectsContainer.innerHTML = '';
+    
+            const numSubjects = subjectsPerSemester[semester];
+    
+            // Dynamically create subject input fields based on the number of subjects
+            for(let i = 1; i <= numSubjects; i++) {
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'subject-container';
+    
+                const label = document.createElement('label');
+                label.setAttribute('for', `sub${i}`);
+                label.innerText = `Subject ${i} Marks:`;
+    
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `sub${i}`;
+                input.name = `sub${i}`;
+                input.min = '0';
+                input.max = '100';
+                input.required = true;
+    
+                subjectDiv.appendChild(label);
+                subjectDiv.appendChild(input);
+    
+                subjectsContainer.appendChild(subjectDiv);
+            }
+    
+            // If marks already entered, populate the form
+            const semData = studentMarks[`semester${semester}`];
+            if(Object.keys(semData).length > 0) {
+                for(let i = 1; i <= numSubjects; i++) {
+                    if(semData[`sub${i}`] !== undefined) {
+                        document.getElementById(`sub${i}`).value = semData[`sub${i}`];
+                    }
+                }
+            } else {
+                document.getElementById('marks-form').reset();
+            }
+        }
+    
+        function hideSemesterForm() {
+            document.getElementById('semester-form').classList.add('hidden');
+            document.getElementById('menu').classList.remove('hidden');
+        }
+    
+        function showFinalResult() {
+            const totalSemesters = 6;
+            // Check if all semesters have been entered
+            for(let i = 1; i <= totalSemesters; i++) {
+                if(Object.keys(studentMarks[`semester${i}`]).length === 0) {
+                    alert(`Marks for Semester ${i} have not been entered yet.`);
+                    return;
+                }
+            }
+    
+            // Calculate overall total and percentage
+            let overallTotal = 0;
+            let overallPercentage = 0;
+            let totalSubjects = 0;
+            let failed = false;
+    
+            for(let i = 1; i <= totalSemesters; i++) {
+                const sem = studentMarks[`semester${i}`];
+                const semTotal = calculateSemesterTotal(i);
+                overallTotal += semTotal;
+                totalSubjects += subjectsPerSemester[i];
+    
+                // Check if any subject is failed in the semester
+                if(hasFailed(i)) {
+                    failed = true;
+                }
+            }
+    
+            // Assuming each subject is out of 100 marks
+            overallPercentage = (overallTotal / (totalSubjects * 100)) * 100;
+            overallPercentage = overallPercentage.toFixed(2);
+    
+            // Determine final result
+            let finalResult = "";
+            if(failed) {
+                finalResult = "Overall Result: Fail!";
+            } else {
+                if(overallPercentage >= 75) {
+                    finalResult = "Congratulations! You have got Distinction.";
+                } else if(overallPercentage >= 60 && overallPercentage < 75) {
+                    finalResult = "Congratulations! You have got 1st Division.";
+                } else if(overallPercentage >= 45 && overallPercentage < 60) {
+                    finalResult = "You have got 2nd Division.";
+                } else if(overallPercentage >= 30 && overallPercentage < 45) {
+                    finalResult = "You have got 3rd Division.";
+                } else {
+                    finalResult = "Sorry! You failed.";
+                }
+            }
+    
+            // Display the final result
+            const resultContent = `
+                <p><strong>Student Name:</strong> ${studentInfo.name}</p>
+                <p><strong>Father's Name:</strong> ${studentInfo.fatherName}</p>
+                <p><strong>Roll Number:</strong> ${studentInfo.rollNumber}</p>
+                <hr>
+                <p><strong>Overall Total Marks:</strong> ${overallTotal} out of ${totalSubjects * 100}</p>
+                <p><strong>Overall Percentage:</strong> ${overallPercentage}%</p>
+                <p><strong>Result:</strong> ${finalResult}</p>
+            `;
+            document.getElementById('result-content').innerHTML = resultContent;
+            document.getElementById('result-display').querySelector('h2').innerText = 'Final Result';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('result-display').classList.remove('hidden');
+        }
+    
+        function calculateSemesterTotal(semester) {
+            const numSubjects = subjectsPerSemester[semester];
+            let semTotal = 0;
+            for(let i = 1; i <= numSubjects; i++) {
+                semTotal += studentMarks[`semester${semester}`][`sub${i}`];
+            }
+            return semTotal;
+        }
+    
+        function hasFailed(semester) {
+            const numSubjects = subjectsPerSemester[semester];
+            for(let i = 1; i <= numSubjects; i++) {
+                if(studentMarks[`semester${semester}`][`sub${i}`] < 30) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    
+        function viewAggregate(semArray) {
+            // semArray is an array of semester numbers, e.g., [1,2]
+    
+            // Check if the required semesters have been entered
+            for(let sem of semArray) {
+                if(Object.keys(studentMarks[`semester${sem}`]).length === 0) {
+                    alert(`Marks for Semester ${sem} have not been entered yet.`);
+                    return;
+                }
+            }
+    
+            // Calculate aggregate total and percentage
+            let aggregateTotal = 0;
+            let aggregatePercentage = 0;
+            let totalSubjects = 0;
+            let failed = false;
+    
+            for(let sem of semArray) {
+                const semTotal = calculateSemesterTotal(sem);
+                aggregateTotal += semTotal;
+                totalSubjects += subjectsPerSemester[sem];
+    
+                // Check if any subject is failed in the semester
+                if(hasFailed(sem)) {
+                    failed = true;
+                }
+            }
+    
+            // Assuming each subject is out of 100 marks
+            aggregatePercentage = (aggregateTotal / (totalSubjects * 100)) * 100;
+            aggregatePercentage = aggregatePercentage.toFixed(2);
+    
+            // Determine aggregate result
+            let aggregateResult = "";
+            if(failed) {
+                aggregateResult = "Aggregate Result: Fail!";
+            } else {
+                if(aggregatePercentage >= 75) {
+                    aggregateResult = "Congratulations! You have got Distinction.";
+                } else if(aggregatePercentage >= 60 && aggregatePercentage < 75) {
+                    aggregateResult = "Congratulations! You have got 1st Division.";
+                } else if(aggregatePercentage >= 45 && aggregatePercentage < 60) {
+                    aggregateResult = "You have got 2nd Division.";
+                } else if(aggregatePercentage >= 30 && aggregatePercentage < 45) {
+                    aggregateResult = "You have got 3rd Division.";
+                } else {
+                    aggregateResult = "Sorry! You failed.";
+                }
+            }
+    
+            // Display the aggregate result
+            const aggregateResultContent = `
+                <p><strong>Student Name:</strong> ${studentInfo.name}</p>
+                <p><strong>Father's Name:</strong> ${studentInfo.fatherName}</p>
+                <p><strong>Roll Number:</strong> ${studentInfo.rollNumber}</p>
+                <hr>
+                <p><strong>Aggregate Total Marks (Semesters ${semArray.join(' & ')}):</strong> ${aggregateTotal} out of ${totalSubjects * 100}</p>
+                <p><strong>Aggregate Percentage:</strong> ${aggregatePercentage}%</p>
+                <p><strong>Result:</strong> ${aggregateResult}</p>
+            `;
+            document.getElementById('aggregate-result-content').innerHTML = aggregateResultContent;
+            document.getElementById('aggregate-result-display').querySelector('h2').innerText = 'Aggregate Result';
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('aggregate-result-display').classList.remove('hidden');
+        }
+    
+        function hideAggregateResult() {
+            document.getElementById('aggregate-result-display').classList.add('hidden');
+            document.getElementById('aggregate-result-display').querySelector('h2').innerText = 'Aggregate Result';
+            document.getElementById('menu').classList.remove('hidden');
+        }
+    
+        function exitProgram() {
+            if(confirm('Are you sure you want to exit?')) {
+                window.close();
+            }
+        }
+    
+        function hideResult() {
+            document.getElementById('result-display').classList.add('hidden');
+            document.getElementById('result-display').querySelector('h2').innerText = 'Semester Result';
+            document.getElementById('menu').classList.remove('hidden');
+        }
+    
+        // Handle Marks Form Submission
+        document.getElementById('marks-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const semester = this.getAttribute('data-semester');
+            const numSubjects = subjectsPerSemester[semester];
+            const marks = {};
+    
+            // Collect marks for each subject
+            for(let i = 1; i <= numSubjects; i++) {
+                const mark = parseInt(document.getElementById(`sub${i}`).value);
+                marks[`sub${i}`] = mark;
+            }
+    
+            // Basic validation is already handled by 'required' and 'min/max' in input fields
+            // Additional validation to ensure all marks are numbers between 0 and 100
+            for(let i = 1; i <= numSubjects; i++) {
+                const mark = marks[`sub${i}`];
+                if(isNaN(mark) || mark < 0 || mark > 100) {
+                    alert(`Please enter a valid mark between 0 and 100 for Subject ${i}.`);
+                    return;
+                }
+            }
+    
+            // Check if marks for this semester already exist
+            if(Object.keys(studentMarks[`semester${semester}`]).length > 0) {
+                const overwrite = confirm(`Marks for Semester ${semester} have already been entered. Do you want to overwrite them?`);
+                if(!overwrite) {
+                    return;
+                }
+            }
+    
+            // Store marks
+            studentMarks[`semester${semester}`] = marks;
+    
+            // Calculate total and percentage
+            let total = 0;
+            for(let i = 1; i <= numSubjects; i++) {
+                total += marks[`sub${i}`];
+            }
+            const percentage = (total / numSubjects).toFixed(2);
+    
+            // Determine division or fail
+            let result = "";
+            let failed = false;
+            for(let i = 1; i <= numSubjects; i++) {
+                if(marks[`sub${i}`] < 30) {
+                    failed = true;
+                    break;
+                }
+            }
+    
+            if(failed) {
+                result = "Fail!";
+            } else {
+                if (percentage >= 75) {
+                    result = "Congratulations! You have got Distinction.";
+                } else if (percentage >= 60 && percentage < 75) {
+                    result = "Congratulations! You have got 1st Division.";
+                } else if (percentage >= 45 && percentage < 60) {
+                    result = "You have got 2nd Division.";
+                } else if (percentage >= 30 && percentage < 45) {
+                    result = "You have got 3rd Division.";
+                } else {
+                    result = "Sorry! You failed.";
+                }
+            }
+    
+            // Display Result
+            const resultContent = `
+                <p><strong>Student Name:</strong> ${studentInfo.name || 'N/A'}</p>
+                <p><strong>Father's Name:</strong> ${studentInfo.fatherName || 'N/A'}</p>
+                <p><strong>Roll Number:</strong> ${studentInfo.rollNumber || 'N/A'}</p>
+                <hr>
+                <p><strong>Semester ${semester} Total Marks:</strong> ${total} out of ${numSubjects * 100}</p>
+                <p><strong>Semester ${semester} Percentage:</strong> ${percentage}%</p>
+                <p><strong>Result:</strong> ${result}</p>
+            `;
+            document.getElementById('result-content').innerHTML = resultContent;
+            document.getElementById('semester-form').classList.add('hidden');
+            document.getElementById('result-display').classList.remove('hidden');
+        });
+    
+    </script>
+    
+</body>
+</html>
